@@ -4,22 +4,39 @@ using Meadow.Foundation;
 using Meadow.Foundation.Leds;
 using System;
 using System.Threading;
+using Meadow.Foundation.Sensors.Buttons;
+using Meadow.Hardware;
+using System.Collections.Generic;
+using MeadowRemoteControl.Types;
 
 namespace MeadowRemoteControl
 {
     public class MeadowApp : App<F7Micro, MeadowApp>
     {
         RgbPwmLed onboardLed;
+        SwitchesAndButtons switchesAndButtons;
+
+        // Buttons
+        readonly IPin sw2 = Device.Pins.D13;
+        readonly IPin sw3 = Device.Pins.D12;
+        readonly IPin sw4 = Device.Pins.D10;
+        readonly IPin sw5 = Device.Pins.D09;
+        readonly IPin sw6 = Device.Pins.D06;
+        readonly IPin sw7 = Device.Pins.D05;
+        readonly IPin sw8 = Device.Pins.D15;
+        readonly IPin sw9 = Device.Pins.D14;
+
 
         public MeadowApp()
         {
             Initialize();
-            CycleColors(1000);
+            TransmitControlState();
         }
 
         void Initialize()
         {
             Console.WriteLine("Initialize hardware...");
+            onboardLed.SetColor(Color.Blue);
 
             onboardLed = new RgbPwmLed(device: Device,
                 redPwmPin: Device.Pins.OnboardLedRed,
@@ -27,42 +44,26 @@ namespace MeadowRemoteControl
                 bluePwmPin: Device.Pins.OnboardLedBlue,
                 3.3f, 3.3f, 3.3f,
                 Meadow.Peripherals.Leds.IRgbLed.CommonType.CommonAnode);
+
+            switchesAndButtons = new SwitchesAndButtons(Device, sw2, sw3, sw4, sw5, sw6, sw7, sw8, sw9);
+
+            onboardLed.SetColor(Color.Green);
         }
 
-        void CycleColors(int duration)
+        DataPackage BuildDataPackage()
         {
-            Console.WriteLine("Cycle colors...");
-
-            while (true)
+            var dataPackage = new DataPackage
             {
-                ShowColorPulse(Color.Blue, duration);
-                ShowColorPulse(Color.Cyan, duration);
-                ShowColorPulse(Color.Green, duration);
-                ShowColorPulse(Color.GreenYellow, duration);
-                ShowColorPulse(Color.Yellow, duration);
-                ShowColorPulse(Color.Orange, duration);
-                ShowColorPulse(Color.OrangeRed, duration);
-                ShowColorPulse(Color.Red, duration);
-                ShowColorPulse(Color.MediumVioletRed, duration);
-                ShowColorPulse(Color.Purple, duration);
-                ShowColorPulse(Color.Magenta, duration);
-                ShowColorPulse(Color.Pink, duration);
-            }
+                SwitchesAndButtons = switchesAndButtons.AsBitFlags()
+            };
+
+            return dataPackage;
         }
 
-        void ShowColorPulse(Color color, int duration = 1000)
+        void TransmitControlState()
         {
-            onboardLed.StartPulse(color, (duration / 2));
-            Thread.Sleep(duration);
-            onboardLed.Stop();
-        }
+            var dataPackage = BuildDataPackage();
 
-        void ShowColor(Color color, int duration = 1000)
-        {
-            Console.WriteLine($"Color: {color}");
-            onboardLed.SetColor(color);
-            Thread.Sleep(duration);
-            onboardLed.Stop();
         }
     }
 }
