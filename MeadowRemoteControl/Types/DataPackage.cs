@@ -10,5 +10,13 @@ namespace MeadowRemoteControl.Types
     {
         // Max size of this struct is 32 bytes - NRF24L01 buffer limit
         public uint SwitchesAndButtons;
+
+        public uint LeftJoystickHorizontal;
+        public uint LeftJoystickVertical;
+        public uint LeftJoystickButton;
+        
+        public uint RightJoystickHorizontal;
+        public uint RightJoystickVertical;
+        public uint RightJoystickButton;
     }
 }
