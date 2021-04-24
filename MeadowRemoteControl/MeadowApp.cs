@@ -9,18 +9,15 @@ using Meadow.Hardware;
 using System.Collections.Generic;
 using MeadowRemoteControl.Types;
 using Meadow.Foundation.Sensors.Hid;
+using Meadow.Foundation.Displays;
+using Meadow.Foundation.Graphics;
+using MeadowRemoteControl.Display;
 
 namespace MeadowRemoteControl
 {
     public class MeadowApp : App<F7Micro, MeadowApp>
     {
-        RgbPwmLed onboardLed;
-        SwitchesAndButtons switchesAndButtons;
-        AnalogJoystickWithButton leftJoystick;
-        AnalogJoystickWithButton rightJoystick;
-        Potentiometer leftPot;
-        Potentiometer rightPot;
-
+        #region Pin Assignments
         // Buttons
         readonly IPin sw2Pin = Device.Pins.D13;
         readonly IPin sw3Pin = Device.Pins.D12;
@@ -42,17 +39,37 @@ namespace MeadowRemoteControl
         //Potentiometers
         readonly IPin leftPotPin = Device.Pins.A05;
         readonly IPin rightPotPin = Device.Pins.A02;
+        #endregion
 
+        // Inputs
+        SwitchesAndButtons switchesAndButtons;
+        AnalogJoystickWithButton leftJoystick;
+        AnalogJoystickWithButton rightJoystick;
+        Potentiometer leftPot;
+        Potentiometer rightPot;
+
+        // Outputs
+        RgbPwmLed onboardLed;
+        OledDisplay display;
 
         public MeadowApp()
         {
             Initialize();
-            TransmitControlState();
+            //TransmitControlState();
+            
         }
 
         void Initialize()
         {
             Console.WriteLine("Initialize hardware...");
+            Console.WriteLine($"Battery Voltage: {Device.GetBatteryLevel():F2}V");
+
+            display = new OledDisplay(Device.CreateI2cBus())
+            {
+                HeaderText = "Initialising...",
+                BatteryVoltage = Device.GetBatteryLevel()
+            };
+            display.StartUpdating();
 
             onboardLed = new RgbPwmLed(device: Device,
                 redPwmPin: Device.Pins.OnboardLedRed,
@@ -72,7 +89,9 @@ namespace MeadowRemoteControl
             leftPot = new Potentiometer(Device, leftPotPin);
             rightPot = new Potentiometer(Device, rightPotPin);
 
+
             onboardLed.SetColor(Color.Green);
+            display.HeaderText = "Meadow F7 Remote";
         }
 
         DataPackage BuildDataPackage()
