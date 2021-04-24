@@ -18,5 +18,8 @@ namespace MeadowRemoteControl.Types
         public uint RightJoystickHorizontal;
         public uint RightJoystickVertical;
         public uint RightJoystickButton;
+
+        public uint LeftPot;
+        public uint RightPot;
     }
 }

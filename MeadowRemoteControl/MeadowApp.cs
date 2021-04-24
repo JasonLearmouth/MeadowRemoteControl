@@ -16,8 +16,10 @@ namespace MeadowRemoteControl
     {
         RgbPwmLed onboardLed;
         SwitchesAndButtons switchesAndButtons;
-        AnalogJoystickWithPushButton leftJoystick;
-        AnalogJoystickWithPushButton rightJoystick;
+        AnalogJoystickWithButton leftJoystick;
+        AnalogJoystickWithButton rightJoystick;
+        Potentiometer leftPot;
+        Potentiometer rightPot;
 
         // Buttons
         readonly IPin sw2Pin = Device.Pins.D13;
@@ -36,6 +38,10 @@ namespace MeadowRemoteControl
         readonly IPin rightJoystickHorizontalPin = Device.Pins.A01;
         readonly IPin rightJoystickVerticalPin = Device.Pins.A00;
         readonly IPin rightJoystickButtonPin = Device.Pins.D04;
+
+        //Potentiometers
+        readonly IPin leftPotPin = Device.Pins.A05;
+        readonly IPin rightPotPin = Device.Pins.A02;
 
 
         public MeadowApp()
@@ -60,8 +66,11 @@ namespace MeadowRemoteControl
 
             switchesAndButtons = new SwitchesAndButtons(Device, sw2Pin, sw3Pin, sw4Pin, sw5Pin, sw6Pin, sw7Pin, sw8Pin, sw9Pin);
 
-            leftJoystick = new AnalogJoystickWithPushButton(Device, leftJoystickHorizontalPin, leftJoystickVerticalPin, leftJoystickButtonPin);
-            rightJoystick = new AnalogJoystickWithPushButton(Device, rightJoystickHorizontalPin, rightJoystickVerticalPin, rightJoystickButtonPin);
+            leftJoystick = new AnalogJoystickWithButton(Device, leftJoystickHorizontalPin, leftJoystickVerticalPin, leftJoystickButtonPin);
+            rightJoystick = new AnalogJoystickWithButton(Device, rightJoystickHorizontalPin, rightJoystickVerticalPin, rightJoystickButtonPin);
+
+            leftPot = new Potentiometer(Device, leftPotPin);
+            rightPot = new Potentiometer(Device, rightPotPin);
 
             onboardLed.SetColor(Color.Green);
         }
@@ -72,14 +81,17 @@ namespace MeadowRemoteControl
             {
                 SwitchesAndButtons = switchesAndButtons.AsBitFlags(),
 
-               
+
                 LeftJoystickHorizontal = leftJoystick.HorizontalValue,
                 LeftJoystickVertical = leftJoystick.VerticalValue,
                 LeftJoystickButton = leftJoystick.ButtonState,
 
                 RightJoystickHorizontal = rightJoystick.HorizontalValue,
                 RightJoystickVertical = rightJoystick.VerticalValue,
-                RightJoystickButton = rightJoystick.ButtonState
+                RightJoystickButton = rightJoystick.ButtonState,
+
+                LeftPot = leftPot.Value,
+                RightPot = rightPot.Value
             };
 
             return dataPackage;

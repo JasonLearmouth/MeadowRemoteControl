@@ -10,9 +10,9 @@ using static Meadow.Foundation.Sensors.Hid.AnalogJoystick;
 
 namespace MeadowRemoteControl.Types
 {
-    public class AnalogJoystickWithPushButton
+    public class AnalogJoystickWithButton
     {
-        public AnalogJoystickWithPushButton(IIODevice device, IPin horizontalPin, IPin verticalPin, IPin buttonInputPin, JoystickCalibration calibration = null, bool isInverted = false, ResistorMode buttonResistorMode = ResistorMode.InternalPullUp)
+        public AnalogJoystickWithButton(IIODevice device, IPin horizontalPin, IPin verticalPin, IPin buttonInputPin, JoystickCalibration calibration = null, bool isInverted = false, ResistorMode buttonResistorMode = ResistorMode.InternalPullUp)
         {
             Joystick = new AnalogJoystick(device.CreateAnalogInputPort(horizontalPin), device.CreateAnalogInputPort(horizontalPin), calibration, isInverted);
             Button = new PushButton(device, buttonInputPin, buttonResistorMode);
