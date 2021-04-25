@@ -64,13 +64,6 @@ namespace MeadowRemoteControl
             Console.WriteLine("Initialize hardware...");
             Console.WriteLine($"Battery Voltage: {Device.GetBatteryLevel():F2}V");
 
-            display = new OledDisplay(Device.CreateI2cBus())
-            {
-                HeaderText = "Initialising...",
-                BatteryVoltage = Device.GetBatteryLevel()
-            };
-            display.StartUpdating();
-
             onboardLed = new RgbPwmLed(device: Device,
                 redPwmPin: Device.Pins.OnboardLedRed,
                 greenPwmPin: Device.Pins.OnboardLedGreen,
@@ -80,6 +73,12 @@ namespace MeadowRemoteControl
             
             onboardLed.SetColor(Color.Blue);
 
+            display = new OledDisplay(Device.CreateI2cBus())
+            {
+                HeaderText = "Initialising...",
+                BatteryVoltage = Device.GetBatteryLevel()
+            };
+            display.StartUpdating();
 
             switchesAndButtons = new SwitchesAndButtons(Device, sw2Pin, sw3Pin, sw4Pin, sw5Pin, sw6Pin, sw7Pin, sw8Pin, sw9Pin);
 
@@ -92,6 +91,8 @@ namespace MeadowRemoteControl
 
             onboardLed.SetColor(Color.Green);
             display.HeaderText = "Meadow F7 Remote";
+
+            StartUpdatingBatteryVoltage();
         }
 
         DataPackage BuildDataPackage()
@@ -114,6 +115,19 @@ namespace MeadowRemoteControl
             };
 
             return dataPackage;
+        }
+
+        void StartUpdatingBatteryVoltage(int updateInterval = 10 * 1000)
+        {
+            Thread t = new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(updateInterval);
+                    display.BatteryVoltage = Device.GetBatteryLevel();
+                }
+            });
+            t.Start();
         }
 
         void TransmitControlState()
